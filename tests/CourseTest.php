@@ -9,6 +9,7 @@
 
     require_once "src/Course.php";
     require_once "src/Student.php";
+    require_once "src/Department.php";
 
     class CourseTest extends PHPUnit_Framework_TestCase
     {
@@ -176,6 +177,7 @@
             //Assert
             $this->assertEquals([$testCourse2], $result);
         }
+
         function testAddStudent()
         {
             //Arrange
@@ -194,6 +196,7 @@
             //Assert
             $this->assertEquals($testCourse->getStudents(), [$testStudent]);
         }
+
         function testGetStudents()
         {
             //Arrange

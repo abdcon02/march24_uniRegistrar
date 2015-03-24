@@ -113,6 +113,10 @@
                 JOIN courses ON (courses_students.courses_id = courses.id)
                 WHERE students.id = {$this->getId()};");
 
+                var_dump($query);
+                echo ("!!!!!!!!");
+                var_dump($query->fetchAll(PDO::FETCH_ASSOC));
+
             $courses_enrolled = array();
             if(!empty($query)){
                 foreach($query as $course){

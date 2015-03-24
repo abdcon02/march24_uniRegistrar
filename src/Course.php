@@ -5,12 +5,14 @@
         private $name;
         private $id;
         private $course_number;
+        private $department_id;
 
-        function __construct($name, $id = null, $course_number = 0)
+        function __construct($name, $id = null, $course_number = 0, $department_id = 1)
         {
             $this->name = $name;
             $this->id = $id;
             $this->course_number = $course_number;
+            $this->department_id = $department_id;
         }
 
         function getId()
@@ -43,9 +45,19 @@
             $this->course_number = (int) $new_course_number;
         }
 
+        function getDepartmentId()
+        {
+            return $this->department_id;
+        }
+
+        function setDepartmentId($new_id)
+        {
+            $this->department_id = (int) $new_id;
+        }
+
         function save()
         {
-            $statement = $GLOBALS['DB']->query("INSERT INTO courses (name, course_number) VALUES ('{$this->getName()}', {$this->getCourseNumber()}) RETURNING id;");
+            $statement = $GLOBALS['DB']->query("INSERT INTO courses (name, course_number, departments_id) VALUES ('{$this->getName()}', {$this->getCourseNumber()}, {$this->getDepartmentId()}) RETURNING id;");
             $result = $statement->fetch(PDO::FETCH_ASSOC);
             $this->setId($result['id']);
 
@@ -60,7 +72,8 @@
                 $name = $class['name'];
                 $id = $class['id'];
                 $course_number = $class['course_number'];
-                $course = new Course($name, $id, $course_number);
+                $department_id = $class['departments_id'];
+                $course = new Course($name, $id, $course_number, $department_id);
                 array_push($returned_courses, $course);
             }
             return $returned_courses;
@@ -95,16 +108,24 @@
             $this->setCourseNumber($new_number);
         }
 
+        function updateDepartmentId($new_id)
+        {
+            $GLOBALS['DB']->exec("UPDATE courses SET departments_id = {$new_id} WHERE id = {$this->getId()};");
+            $this->setDepartmentId($new_id);
+        }
+
         function delete()
         {
             $GLOBALS['DB']->exec("DELETE FROM courses WHERE id = {$this->getId()};");
             $GLOBALS['DB']->exec("DELETE FROM courses_students WHERE courses_id = {$this->getId()};");
+            $GLOBALS['DB']->exec("DELETE FROM courses_majors WHERE courses_id = {$this->getId()};");
         }
 
         function addStudent($student)
         {
             $GLOBALS['DB']->exec("INSERT INTO courses_students (courses_id, students_id) VALUES ({$this->getId()}, {$student->getId()});");
         }
+
 
         function getStudents()
         {
