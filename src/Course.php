@@ -71,6 +71,57 @@
             $GLOBALS['DB']->exec("DELETE FROM courses *;");
         }
 
+        static function find($search_id)
+        {
+            $found_course = null;
+            $courses = Course::getAll();
+            foreach($courses as $class){
+                if($class->getId() == $search_id){
+                    $found_course = $class;
+                }
+            }
+            return $found_course;
+        }
+
+        function updateName($new_name)
+        {
+            $GLOBALS['DB']->exec("UPDATE courses SET name = '{$new_name}' WHERE id = {$this->getId()};");
+            $this->setName($new_name);
+        }
+        function updateCourseNumber($new_number)
+        {
+            $GLOBALS['DB']->exec("UPDATE courses SET course_number = '{$new_number}' WHERE id = {$this->getId()};");
+            $this->setCourseNumber($new_number);
+        }
+
+        function delete()
+        {
+            $GLOBALS['DB']->exec("DELETE FROM courses WHERE id = {$this->getId()};");
+            $GLOBALS['DB']->exec("DELETE FROM courses_students WHERE courses_id = {$this->getId()};");
+        }
+
+        function addStudent($student)
+        {
+            $GLOBALS['DB']->exec("INSERT INTO courses_students (courses_id, students_id) VALUES ({$this->getId()}, {$student->getId()});");
+        }
+
+        function getStudents()
+        {
+            $query = $GLOBALS['DB']->query("SELECT students.* FROM
+                courses JOIN courses_students ON (courses.id = courses_students.courses_id)
+                JOIN students ON (courses_students.students_id = students.id)
+                WHERE courses.id={$this->getId()};");
+            $students_in_course = array();
+            foreach($query as $student) {
+                $name = $student['name'];
+                $id = $student['id'];
+                $enroll_date = $student['enrollment_date'];
+                $new_student = new Student($name, $id, $enroll_date);
+                array_push($students_in_course, $new_student);
+            }
+            return $students_in_course;
+        }
+
     }
 
  ?>
