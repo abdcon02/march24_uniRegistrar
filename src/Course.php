@@ -88,6 +88,7 @@
             $GLOBALS['DB']->exec("UPDATE courses SET name = '{$new_name}' WHERE id = {$this->getId()};");
             $this->setName($new_name);
         }
+
         function updateCourseNumber($new_number)
         {
             $GLOBALS['DB']->exec("UPDATE courses SET course_number = '{$new_number}' WHERE id = {$this->getId()};");
@@ -112,12 +113,14 @@
                 JOIN students ON (courses_students.students_id = students.id)
                 WHERE courses.id={$this->getId()};");
             $students_in_course = array();
-            foreach($query as $student) {
-                $name = $student['name'];
-                $id = $student['id'];
-                $enroll_date = $student['enrollment_date'];
-                $new_student = new Student($name, $id, $enroll_date);
-                array_push($students_in_course, $new_student);
+            if(!empty($query)){
+                foreach($query as $student) {
+                    $name = $student['name'];
+                    $id = $student['id'];
+                    $enroll_date = $student['enrollment_date'];
+                    $new_student = new Student($name, $id, $enroll_date);
+                    array_push($students_in_course, $new_student);
+                }
             }
             return $students_in_course;
         }

@@ -217,23 +217,32 @@
             //Assert
             $this->assertEquals($testCourse->getStudents(), [$testStudent, $testStudent2]);
         }
-        // function testDelete()
-        // {
-        //     //Arrange
-        //     $name = "Archery";
-        //     $id = 1;
-        //     $testCourse = new Course($name, $id);
-        //     $testCourse->save();
-        //
-        //     $student = "Billy Bob";
-        //     $testStudent = new Student($student);
-        //     $testStudent->save();
-        //     //Act
-        //     $testCourse->addStudent($testStudent);
-        //     $testCourse->delete();
-        //     //Assert
-        //     $this->assertEquals([], $testStudent->getCourses());
-        // }
+        function testDelete()
+        {
+            //Arrange
+            $name = "Archery";
+            $id = 1;
+            $testCourse = new Course($name, $id);
+            $testCourse->save();
+
+            $name2 = "Piano";
+            $id2 = 3;
+            $testCourse2 = new Course($name2, $id2);
+            $testCourse2->save();
+
+            $student = "Billy Bob";
+            $testStudent = new Student($student);
+            $testStudent->save();
+
+            //Act
+            $testCourse->addStudent($testStudent);
+            $testCourse2->addStudent($testStudent);
+            $testCourse->delete();
+            $result = $testStudent->getCourses();
+
+            //Assert
+            $this->assertEquals([$testCourse2], $result);
+        }
 
     }
 

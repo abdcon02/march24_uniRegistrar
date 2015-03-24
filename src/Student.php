@@ -70,6 +70,62 @@
         {
             $GLOBALS['DB']->exec("DELETE FROM students *;");
         }
+
+        static function find($search_id)
+        {
+            $found_student = null;
+            $students = Student::getAll();
+            foreach($students as $student){
+                if($student->getId() == $search_id){
+                    $found_student = $student;
+                }
+            }
+            return $found_student;
+        }
+
+        function updateName($new_name)
+        {
+            $GLOBALS['DB']->exec("UPDATE students SET name = '{$new_name}' WHERE id = {$this->getId()};");
+            $this->setName($new_name);
+        }
+
+        function updateEnrollDate($new_date)
+        {
+            $GLOBALS['DB']->exec("UPDATE students SET enrollment_date = '{$new_date}' WHERE id = {$this->getId()};");
+            $this->setEnrollDate($new_date);
+        }
+
+        function delete()
+        {
+            $GLOBALS['DB']->exec("DELETE FROM students WHERE id = {$this->getId()};");
+            $GLOBALS['DB']->exec("DELETE FROM courses_students WHERE students_id = {$this->getId()};");
+        }
+
+        function addCourse($course)
+        {
+            $GLOBALS['DB']->exec("INSERT INTO courses_students (courses_id, students_id) VALUES ({$course->getId()}, {$this->getId()});");
+        }
+
+        function getCourses()
+        {
+            $query = $GLOBALS['DB']->query("SELECT courses.* FROM
+                students JOIN courses_students ON (students.id = courses_students.students_id)
+                JOIN courses ON (courses_students.courses_id = courses.id)
+                WHERE students.id = {$this->getId()};");
+
+            $courses_enrolled = array();
+            if(!empty($query)){
+                foreach($query as $course){
+                    $name = $course['name'];
+                    $id = $course['id'];
+                    $course_number = $course['course_number'];
+                    $new_course = new Course($name, $id, $course_number);
+                    array_push($courses_enrolled, $new_course);
+                }
+            }
+            return $courses_enrolled;
+        }
+
     }
 
 ?>
